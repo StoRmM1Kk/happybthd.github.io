@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Сюрприз</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+            background-color: #222;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+        button {
+            font-size: 24px;
+            padding: 15px 30px;
+            background-color: red;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 10px;
+        }
+        .hidden {
+            display: none;
+        }
+        #message {
+            font-size: 36px;
+            margin-top: 20px;
+            display: none;
+        }
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <button id="btn" onclick="showMessage()">Жми</button>
+    <div id="message">С днём рождения, бро!</div>
+    <canvas id="fireworks"></canvas>
+    <script>
+        function showMessage() {
+            document.getElementById('message').style.display = 'block';
+            document.getElementById('btn').style.display = 'none';
+            launchFireworks();
+        }
+
+        function launchFireworks() {
+            const canvas = document.getElementById('fireworks');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            let particles = [];
+
+            class Particle {
+                constructor(x, y, color) {
+                    this.x = x;
+                    this.y = y;
+                    this.color = color;
+                    this.size = Math.random() * 6 + 4;
+                    this.speedX = (Math.random() - 0.5) * 7;
+                    this.speedY = (Math.random() - 0.5) * 7;
+                    this.life = 120;
+                }
+                update() {
+                    this.x += this.speedX;
+                    this.y += this.speedY;
+                    this.life -= 1;
+                }
+                draw() {
+                    ctx.fillStyle = this.color;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+
+            function createFirework() {
+                let x = Math.random() * canvas.width;
+                let y = Math.random() * canvas.height / 2;
+                let colors = ['red', 'blue', 'yellow', 'green', 'orange', 'purple', 'white'];
+                let color = colors[Math.floor(Math.random() * colors.length)];
+                for (let i = 0; i < 80; i++) {
+                    particles.push(new Particle(x, y, color));
+                }
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach((particle, index) => {
+                    particle.update();
+                    particle.draw();
+                    if (particle.life <= 0) particles.splice(index, 1);
+                });
+                requestAnimationFrame(animate);
+            }
+
+            setInterval(createFirework, 300);
+            animate();
+        }
+    </script>
+</body>
+</html>
